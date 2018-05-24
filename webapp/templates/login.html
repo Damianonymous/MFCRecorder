@@ -1,0 +1,23 @@
+{% extends 'layout.html' %}
+{% block head %}
+    {{ super() }}
+    <title>login</title>
+{% endblock %}
+{% block body %}
+    <div class="container">
+    	<div class="col-md-offset-4 col-md-4">
+		    <form action="{{ url_for('login') }}" method="POST">
+		    	<div class="form-group">
+		    		<label for="username">Username:</label>
+		    		<input type="text" class="form-control" id="username" name="username" autofocus/>
+		    	</div>
+		    	<div class="form-group">
+		    		<label for="password">Password:</label>
+		    		<input type="password" class="form-control" id="password" name="password"/>
+		    	</div>
+		    	{% if error %}<div class="alert alert-danger" role="alert">{{ error }}</div>{% endif %}
+		        <input type="submit" class="btn btn-default" value="Login">
+		    </form>
+		</div>
+	</div>
+{% endblock %}

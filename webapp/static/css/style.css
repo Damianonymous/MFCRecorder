@@ -1,0 +1,8 @@
+h1 {
+  text-transform: uppercase; }
+
+  body {
+    padding-top: 60px; }
+
+    .popover {
+      max-width: 45%; }

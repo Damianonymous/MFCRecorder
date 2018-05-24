@@ -1,0 +1,21 @@
+h1{
+    text-transform: uppercase;
+}
+
+%absolute-centered{
+    position: absolute;
+    left: 0;
+    right: 0;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+/* Bootstrap Tweaks*/
+
+body {
+  padding-top: 60px;
+}
+
+.popover{
+    max-width: 45%;
+}

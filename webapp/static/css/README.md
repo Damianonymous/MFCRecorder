@@ -1,0 +1,1 @@
+This folder will contain auto-generated .css files. Those will only be generated if this directory exists beforehand though.

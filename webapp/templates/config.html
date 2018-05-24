@@ -1,0 +1,153 @@
+{% extends 'layout.html' %}
+
+{% block head %}
+    {{ super() }}
+    <title>MFCRecorder - config</title>
+    <!-- could be used to save after every change, could also be used to only change single settings and remove the submit button -->
+    <!--<script src="{{ url_for('static', filename='js/form.js') }}"></script>-->
+{% endblock %}
+
+{% macro input(name, label, value, tooltip='', width_class='w30', type='text') %}
+    <div class="form-group">
+        <label for="{{ label }}">
+            {% if type == 'checkbox' %}
+                <input type="{{ type }}" id="{{ label }}" name="{{ name }}" value="True" data-toggle="popover"
+                       data-placement="auto top" data-trigger="hover"
+                       {% if tooltip %}data-content="{{ tooltip }}"{% endif %} {% if value %}checked{% endif %} />
+                <input type="hidden" name="{{ name }}" value="False" />
+            {% endif %}
+            {{ label }}
+            {% if type != 'checkbox' %}
+                <br />
+                <input class="form-control" type="{{ type }}" id="{{ label }}" name="{{ name }}" data-toggle="popover"
+                       data-placement="auto top" data-trigger="hover" data-html="true"
+                       {% if tooltip %}data-content="{{ tooltip }}"{% endif %} value="{{ value }}" />
+            {% endif %}
+        </label>
+    </div>
+{% endmacro %}
+
+{% set wishlist_tooltip %}
+    <p>relative from config.conf or absolute path to the wishlist</p>
+{% endset %}
+
+{% set directory_structure_tooltip %}
+    <p>set the directory structure - default is &quot;{path}/{uid}/{year}.{month}.{day}_{hour}.{minutes}.{seconds}_{model}.mp4&quot;</p>
+    <p>{auto} = for autoRecording conditions below, it is the reason why the recording was started followed by &quot;_&quot; - These are: TAGS_, VIEWERS_, SCORE_, and NEW_. If a model is in the wanted list, this will be blank</p>
+    <p>{path} = save_directory set above. (your directory structure should start with this)</p>
+    <p>{model} = the models name</p>
+    <p>{uid} = models uid or broadcaster id. This is a number which is always consistent. The models name can be changed, so this is what I find best for keeping all videos of a model in the same directory</p>
+    <p>{year}, {month}, {day}, {hour}, {minutes}, {seconds} should all be easy enough to figure out what these are</p>
+    <p>you can also change &quot;.mp4&quot; to another extension. &quot;.ts&quot; is what the stream is actual broadcast as.</p>
+    <p>example using a madeup &quot;hannah&quot; who has the uid 208562: {path}/{uid}/{year}/{year}.{month}.{day}_{hour}.{minutes}.{seconds}_{model}.mp4 = &quot;/Users/Joe/MFC/208562/2017/2017.07.26_19.34.47_hannah.mp4&quot;</p>
+    <p>This will also be the &quot;Download directory&quot; or temp directory if you set a &quot;completed_directory&quot;</p>
+{% endset %}
+
+{% set completed_directory_tooltip %}
+    <p>(OPTIONAL) - leave blank if you dont want files moved after completed</p>
+    <p>The files will be moved here once the stream has ended. The same naming structure will be used as above</p>
+    <p>if this is left empty, the videos wll remain in the same directory they were originally saved to</p>
+    <p>This path should be to a directory, not a filename! so do not include the filename portion, only the directory.</p>
+{% endset %}
+
+{% set min_space_tooltip %}
+    <p>minimum space in GB - when the available disk space available on the mnt where the download directory is located, the recordings will stop.</p>
+{% endset %}
+
+{% set post_processing_command_tooltip %}
+    <p>(OPTIONAL) - leave blank if you dont want to run a post processing script on the files</p>
+    <p>You can set a command to be ran on the file once it is completed. This can be any sort of a script you would like.</p>
+    <p>You can create a script to convert the video via ffmpeg to make it compatible for certain devices, create a contact sheet of the video</p>
+    <p>upload the video to a cloud storage drive via rclone, or whatever else you see fit.</p>
+    <p>set the string to be the same as you you would type into terminal to call the script manually.</p>
+    <p>The peramaters which will be passed to the script are as follows:</p>
+    <p>1 = full file path (ie: /Users/Joe/MFC/208562/2017/2017.07.26_19.34.47_hannah.mp4)</p>
+    <p>2 = filename (ie : 2017.07.26_19.34.47_hannah.mp4)</p>
+    <p>3 = directory (ie : /Users/Joe/MFC/208562/hannah/2017/)</p>
+    <p>4 = models name (ie: hannah)</p>
+    <p>5 = uid (ie: 208562) (explained above)</p>
+    <p>to call a bash script called &quot;MoveToGoogleDrive.sh&quot; and located in the user Joes home directory, you would use:</p>
+    <p>postProcessingCommand = &quot;bash /Users/Joe/home/MoveToGoogleDrive.sh&quot;</p>
+    <p>this script will be ran on the files &quot;download location&quot; prior to it being moved to its &quot;completed location&quot;.</p>
+    <p>The moving of the file will not take place if a post processing script is ran, so if you want to move it once it is completed, do so through commands in the post processing script.</p>
+{% endset %}
+
+{% set post_processing_thread_count_tooltip %}
+    <p>Because depending on what the post processing script does, it may be demanding on the system.</p>
+    <p>Set the maximum number of concurrent post processing scripts you would like to be ran at one time.</p>
+    <p>(required if using a post processing script)</p>
+{% endset %}
+
+{% set priority_tooltip %}
+    <p>only records models with priority value greater than or equal to this number</p>
+{% endset %}
+
+{% set viewers_tooltip %}
+    <p>start recording if the number of viewers in there room is greater than &quot;viewers&quot; variable</p>
+    <p>if autoStopViewers is greater that this number, this number will be set to autoStopViewers</p>
+{% endset %}
+
+{% set auto_stop_viewers_tooltip %}
+    <p>stop recordings started because of viewers when less than this amount of people are watching</p>
+{% endset %}
+
+{% set score_tooltip %}
+    <p>start recording if camscore is greater than &quot;score&quot; variable</p>
+{% endset %}
+
+{% set newer_than_hours_tooltip %}
+    <p>start recording any model whos account was created less than this amount of hours ago.</p>
+{% endset %}
+
+{% set tags_tooltip %}
+    <p>automatically record models who are not in the wanted list, but have set certain tags.</p>
+    <p>set the desired tags, with each tag separated by a comma.</p>
+{% endset %}
+
+{% set min_tags_tooltip %}
+    <p>set the minimum number of tags required to start recording a model.</p>
+{% endset %}
+
+{% set old_password_tooltip %}
+    <p>Old password. Only required for password changes.</p>
+{% endset %}
+
+{% set new_password_tooltip %}
+    <p>Type your new password twice. Leave empty if no password change is wanted.</p>
+{% endset %}
+
+{% block body %}
+    <div class="container">
+        <form id="form" action="{{ url_for('config') }}" method="POST">
+            <h1>paths</h1>
+            {{ input('paths:wishlist_path', 'wishlist', config.settings.conf_wishlist_path, wishlist_tooltip) }}
+            {{ input('paths:save_directory', 'save directory', config.settings.conf_save_directory) }}
+            {{ input('paths:directory_structure', 'directory structure', config.settings.directory_structure, directory_structure_tooltip) }}
+            {{ input('paths:completed_directory', 'completed directory', config.settings.conf_completed_directory, completed_directory_tooltip) }}
+            <h1>settings</h1>
+            {{ input('settings:check_interval', 'check interval', config.settings.interval, type='number') }}
+            {{ input('settings:min_space', 'minimum space', config.settings.min_space, min_space_tooltip, type='number') }}
+            {{ input('settings:post_processing_command', 'post processing command', config.settings.post_processing_command, post_processing_command_tooltip, 'w60') }}
+            {{ input('settings:post_processing_thread_count', 'post processing thread count', config.settings.post_processing_thread_count, post_processing_thread_count_tooltip, type='number') }}
+            <!-- min_viewers and stop_viewers omitted because currently ignored in the script -->
+            {{ input('settings:priority', 'priority', config.settings.priority, priority_tooltip, type='number') }}
+            <h1>auto recording</h1>
+            {{ input('auto_recording:viewers', 'viewers', config.filter.viewers, viewers_tooltip, type='number') }}
+            {{ input('auto_recording:auto_stop_viewers', 'auto stop viewers', config.filter.auto_stop_viewers, auto_stop_viewers_tooltip, type='number') }}
+            {{ input('auto_recording:score', 'score', config.filter.score, score_tooltip, type='number') }}
+            {{ input('auto_recording:newer_than_hours', 'newer than (hours)', config.filter.newer_than_hours, newer_than_hours_tooltip, type='number') }}
+            {{ input('auto_recording:tags', 'tags', config.filter.wanted_tags_str, tags_tooltip) }}
+            {{ input('auto_recording:min_tags', 'minimum tags', config.filter.min_tags, min_tags_tooltip, type='number') }}
+            {{ input('auto_recording:tag_viewers', 'tag viewers', config.filter.tag_viewers, type='number') }}
+            {{ input('auto_recording:tag_stop_viewers', 'tag stop viewers', config.filter.tag_stop_viewers, type='number') }}
+            <h1>web</h1>
+            {{ input('web:port', 'port', config.settings.port, type='number') }}
+            {{ input('web:enabled', 'enabled', config.settings.web_enabled, type='checkbox') }}
+            {{ input('web:username', 'username', config.settings.username) }}
+            {{ input('password0', 'old password', '', old_password_tooltip, type='password') }}
+            {{ input('password1', 'new password', '', new_password_tooltip, type='password') }}
+            {{ input('password2', 'repeat new password', '', type='password') }}
+            <input class="btn btn-default" type="submit" value="save" />
+        </form>
+    </div>
+{% endblock %}

@@ -1,0 +1,48 @@
+{% extends 'layout.html' %}
+{% block head %}
+    {{ super() }}
+    <title>welcome!</title>
+{% endblock %}
+{% block body %}
+    <div class="container">
+        <div class="row">
+            <form action="{{ url_for('add') }}">
+                <div class="col-md-2">
+                    <input class="form-control" type="text" name="uid_or_name" placeholder="uid or name" />
+                </div>
+                <div class="col-md-4">
+                    <div class="btn-group" role="group">
+                        <input class="btn btn-default" type="submit" value="add" />
+                        <input class="btn btn-default" type="submit" value="remove" formaction="{{ url_for('remove') }}" />
+                    </div>
+                </div>
+            </form>
+        </div>
+        <div class="row">&nbsp;</div>
+        <div class="row">
+        {% for uid, session in recording.items() %}
+            {% set is_wanted = uid in wanted %}
+                <div class="col-md-2 {% if is_wanted %} alert alert-success {% elif session['condition'] == 1 %} alert alert-danger {% else %} alert alert-info {% endif %}">
+                    <div>
+                        <a title="profile" href="http://profiles.myfreecams.com/{{ session['nm'] }}" rel="noreferrer" target="_blank">
+                            {{ session['nm'] }}
+                        </a>
+                        ({{ session['rc'] }})
+                    </div>
+                    <div>{{ condition_text(session['condition'], session.get('condition-text')) }}</div>
+                    <img class="img-responsive" alt="{{ session['nm'] }} thumbnail" src="{{ url_for('thumbnail', uid=uid) }}" />
+                    <div>
+                        {% if not is_wanted %}
+                            <a title="add to wanted list" href="{{ url_for('add') }}?uid_or_name={{ uid }}">add</a> |
+                        {% else %}
+                            <a title="remove from wanted list" href="{{ url_for('remove') }}?uid_or_name={{ uid }}">remove</a> |
+                        {% endif %}
+                        <a title="chatroom on MFC" href="http://www.myfreecams.com/#{{ session['nm'] }}" rel="noreferrer" target="_blank">chat</a>
+                    </div>
+                </div>
+        {% else %}
+            <div>no recordings</div>
+        {% endfor %}
+        </div>
+    </div>
+{% endblock %}

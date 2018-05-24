@@ -1,0 +1,75 @@
+{% extends 'layout.html' %}
+{% block head %}
+    {{ super() }}
+    <title>MFCRecorder - Wanted</title>
+{% endblock %}
+{% block body %}
+
+    <div class="col-md-12">
+        <form>
+            <a id="submit_wl" class="btn btn-default">Save Changes</a>
+            <br/>
+            <br/>
+            <table id="wanted_list" cellspacing="0" width="100%" class="table table-striped">
+                <thead>
+                    <tr>
+                        <th>UID</th>
+                        <th>Enabled</th>
+                        <th>Mode</th>
+                        <th data-orderable="false">Custom Name</th>
+                        <th data-orderable="false">Comment</th>
+                        <th>Min Viewers</th>
+                        <th>Stop Viewers</th>
+                        <th>Priority</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for uid, settings in wanted.items() %}
+                        <tr>
+                            <td>{{uid}}</td>
+                            <td data-order="{{settings['enabled']}}">
+                                <input type="checkbox" name="{{uid}}:enabled" value="True" data-name="enabled" {% if settings['enabled'] %} checked {% endif %} />
+                                <input type="hidden" name="{{uid}}:enabled" value="False">
+                            </td>
+                            <td data-order="{{settings['list_mode']}}">
+                                <select class="form-control" name="{{uid}}:list_mode" data-name="mode">
+                                    <option value="0" {% if settings['list_mode'] == 0 %} selected {% endif %}>whitelist</option>
+                                    <option value="1" {% if settings['list_mode'] == 1 %} selected {% endif %}>blacklist</option>
+                                </select>
+                            </td>
+                            <td data-search="{{settings['custom_name']}}"><input type="text" class="form-control" name="{{uid}}:custom_name" value="{{settings['custom_name']}}" data-name="custom_name" /></td>
+                            <td data-search="{{settings['comment']}}"><input type="text" class="form-control" name="{{uid}}:comment" value="{{settings['comment']}}" data-name="comment" /></td>
+                            <td data-order="{{settings['min_viewers']}}"><input type="number" class="form-control" name="{{uid}}:min_viewers" value="{{settings['min_viewers']}}" data-name="min_viewers" /></td>
+                            <td data-order="{{settings['stop_viewers']}}"><input type="number" class="form-control" name="{{uid}}:stop_viewers" value="{{settings['stop_viewers']}}" data-name="stop_viewers" /></td>
+                            <td data-order="{{settings['priority']}}"><input type="number" class="form-control" name="{{uid}}:priority" value="{{settings['priority']}}" data-name="priority" /></td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </form>
+    </div>
+{% endblock %}
+{% block script %}
+    <script type="text/javascript" src="https://cdn.datatables.net/v/bs/dt-1.10.16/fh-3.1.3/r-2.2.1/datatables.min.js"></script>
+    <script>
+        $(document).ready(function() {
+            // Initialize Datatable
+            table = $('#wanted_list').DataTable();
+
+            // On click gather all datatable rows and submit/post them via ajax
+            $("#submit_wl").click(function () {
+                data = table.$('*').serialize();
+
+                $.post( "{{ url_for('wanted') }}", data, function () {
+                    /*
+                        Because we submit the form via ajax the flask flash message is not shown.
+                        I solved this with a js alert because i don't have time to properly add a bootstrap
+                        alert, but this should definitely be added to complete the look of the ui.
+                     */
+                    alert("Updated wishlist submitted");
+                    console.log("Updated wishlist submitted");
+                } );
+            });
+        });
+    </script>
+{% endblock %}
