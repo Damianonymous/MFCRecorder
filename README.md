@@ -157,7 +157,7 @@ You can create your own "post processing" script which can be called at the end 
 
 ## Conditional recording
 
-In the config file you can specify conditions in which models who are not in the wnated list should be recorded. There is also a blacklist you can create and add models UID to if you want to specify models who will not be recorded even if these conditions are met.
+In the config file you can specify conditions in which models who are not in the wanted list should be recorded. There is also a blacklist you can create and add models UID to if you want to specify models who will not be recorded even if these conditions are met.
 
 **Tags**: you can add a comma (,) separated list of tags which models will be checked against each models specified tags.
 
